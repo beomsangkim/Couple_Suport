@@ -7,3 +7,4 @@ db/.pgdata/
 
 # /court 스킬의 재판 기록(아이디어·판결문이 들어감)
 .court/
+__pycache__/
