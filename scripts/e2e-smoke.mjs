@@ -160,6 +160,15 @@ await haneul.page.waitForURL(/ended/);
 await min.page.goto(`${BASE}/agreements/a_b_split`);
 await expectText(min.page, "이 기록에 접근할 수 없어요");
 
+// 9-1) 광고 분리(개정안 §11.1): 앱 CSP에 광고 도메인이 없고, 세션 쿠키가 __Host- 접두어로 발급된다
+{
+  const res = await min.page.request.get(`${BASE}/login`);
+  const csp = res.headers()["content-security-policy"] ?? "";
+  if (/googlesyndication|doubleclick|adservice|googletagmanager/i.test(csp)) problems.push(`앱 CSP에 광고 도메인: ${csp}`);
+  const names = (await min.context.cookies()).map((c) => c.name);
+  if (!names.includes("__Host-sid")) problems.push(`세션 쿠키 이름이 __Host-sid가 아님: ${names.join(", ")}`);
+}
+
 // 10) 320px 폭에서 가로 스크롤 없음
 await min.page.setViewportSize({ width: 320, height: 700 });
 for (const p of ["/", "/money", "/agreements", "/settings"]) {

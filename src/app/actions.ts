@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { ZodError } from "zod";
 import { AppError, type ErrorCode } from "@/server/errors";
-import { cookieOptions, getCtx, INVITE_COOKIE, SESSION_COOKIE } from "@/server/session";
+import { clearCookie, cookieOptions, getCtx, INVITE_COOKIE, SESSION_COOKIE } from "@/server/session";
 import { resetStore } from "@/server/store";
 import type { Ctx } from "@/server/services/access";
 import * as authSvc from "@/server/services/auth";
@@ -49,13 +49,13 @@ export async function demoLoginAction(userId: string): Promise<void> {
 export async function logoutAction(): Promise<void> {
   const ctx = await getCtx();
   authSvc.logout(ctx);
-  (await cookies()).delete(SESSION_COOKIE);
+  await clearCookie(SESSION_COOKIE);
   redirect("/login");
 }
 
 export async function resetDemoAction(): Promise<void> {
   resetStore();
-  (await cookies()).delete(SESSION_COOKIE);
+  await clearCookie(SESSION_COOKIE);
   redirect("/login");
 }
 
@@ -176,6 +176,6 @@ export async function exportAction() {
 }
 
 export async function clearInviteCookieAction(): Promise<void> {
-  (await cookies()).delete(INVITE_COOKIE);
+  await clearCookie(INVITE_COOKIE);
   redirect("/");
 }
